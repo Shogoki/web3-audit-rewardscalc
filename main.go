@@ -1,21 +1,11 @@
+/*
+Copyright © 2023 NAME HERE <EMAIL ADDRESS>
+
+*/
 package main
 
-import (
-    "fmt"
-    "shogoki/audit-rewardscalc/parser"
-    "os"
-    "log"
-    "io"
-)
+import "shogoki/audit-rewardscalc/cmd"
 
 func main() {
-    stdIn, err := io.ReadAll(os.Stdin)
-    if(err != nil) {
-        panic(err)
-    }
-    issues, err := parser.GetContestIssues(stdIn)
-    if(err != nil) {
-        log.Fatal("Failed to get Issues")
-    }
-    fmt.Println(len(issues))
+	cmd.Execute()
 }

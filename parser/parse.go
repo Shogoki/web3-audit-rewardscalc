@@ -41,47 +41,42 @@ type Label struct {
 }
 
 type Issue struct {
-	isMain     bool
-	title      string
-	body       string   //TODO: Do we need body here, maybe better bodyHTML?
-	labels     []string //TODO: Do we need to expose labels here?
-	severity   string
-	number     int
-	author     string
-	duplicates []Issue
+	IsMain     bool
+	Title      string
+	Body       string   //TODO: Do we need body here, maybe better bodyHTML?
+	Labels     []string //TODO: Do we need to expose labels here?
+	Severity   string
+	Number     int
+	Author     string
+	Duplicates []Issue
 }
 
 func (v Issue) GetShares() float64 {
 
-	totalFound := float64(len(v.duplicates) + 1)
+	totalFound := float64(len(v.Duplicates) + 1)
 	sevMultiplier := 1.0
-	if v.severity == "High" {
+	if v.Severity == "High" {
 		sevMultiplier = 5.0
 	}
 	return sevMultiplier * math.Pow(0.9, (totalFound-1)) / totalFound
 }
 
-type Contest struct {
-	repositoryName string
-	potSize        uint16
-	issues         []Issue
-}
 
 func (v RawIssue) toIssue() Issue {
 	iss := Issue{}
-	iss.body = v.Body
-	iss.number = v.Number
-	iss.title = v.Title
-    iss.labels = make([]string, len(v.Labels.Nodes))
+	iss.Body = v.Body
+	iss.Number = v.Number
+	iss.Title = v.Title
+    iss.Labels = make([]string, len(v.Labels.Nodes))
 	for i, label := range v.Labels.Nodes {
-		iss.labels[i] = label.Name
+		iss.Labels[i] = label.Name
 		if label.Name == "High" {
-			iss.severity = "High"
+			iss.Severity = "High"
 		} else if label.Name == "Medium" {
-			iss.severity = "Medium"
+			iss.Severity = "Medium"
 		}
 	}
-	iss.author = strings.Split(v.Body, "\n")[0]
+	iss.Author = strings.Split(v.Body, "\n")[0]
 
 	return iss
 }
@@ -89,7 +84,7 @@ func (v IssueEntry) toIssues(isMain bool) []Issue {
 	issues := make([]Issue, len(v.Nodes))
 	for i, iss := range v.Nodes {
 		issues[i] = iss.toIssue()
-		issues[i].isMain = isMain
+		issues[i].IsMain = isMain
 	}
 	return issues
 }
@@ -130,6 +125,7 @@ func contains(slice []string, s string) bool {
     return false
 
 }
+
 func GetContestIssues(gqlResponse []byte) ([]Issue, error) {
 	var root GQLRoot
     decoder := json.NewDecoder(bytes.NewReader(gqlResponse))
@@ -150,9 +146,9 @@ func GetContestIssues(gqlResponse []byte) ([]Issue, error) {
             }
 			return nil, err
 		}
-		for _, iss := range issues {
-			if iss.number == id {
-				iss.duplicates = append(iss.duplicates, dup.toIssue())
+		for i := range issues {
+			if issues[i].Number == id {
+				issues[i].Duplicates = append(issues[i].Duplicates, dup.toIssue())
 			}
 		}
 	}
