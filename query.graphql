@@ -1,0 +1,29 @@
+# Type queries here, and you will see intelligent autosuggestions
+# aware of GitHub's current GraphQL schema, equipped with live
+# syntax and validation errors highlighted within the text. We'll
+# get you started with a simple query showing your username!
+
+query {
+  repository(owner: "sherlock-audit" name: "2023-10-real-wagmi-judging") {
+    duplicates: issues(labels: ["duplicate"], last: 100) {
+        nodes {
+            body
+            number
+            title
+            labels(last: 10) { nodes { name }}
+        }
+    }
+    openIssues: issues(states: [OPEN], last: 100) {
+    	nodes {
+            body
+            number 
+            title
+            labels(last: 10) {
+                nodes {
+                    name
+                }
+            }
+        }
+    }
+  }
+}
