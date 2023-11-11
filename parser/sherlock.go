@@ -18,7 +18,8 @@ type Contest struct {
 func (v Contest) GetTotalShares() float64{
     var shares float64
     for _, issue := range v.Issues { 
-        shares += issue.GetShares()
+        totalFound := len(issue.Duplicates) +1
+        shares += issue.GetShares() * float64(totalFound)
     }
     return shares
 }

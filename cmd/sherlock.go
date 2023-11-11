@@ -34,16 +34,21 @@ var sherlockCmd = &cobra.Command{
         log.Fatal("Failed to get Issues")
     }
     totalShares := contest.GetTotalShares()
-    fmt.Printf("Contest %s\nTOTAL Issues %2d | PrizePool: %6d | Total Shares: %6.3f\n",repoName, len(contest.Issues), contest.PrizePool, contest.GetTotalShares())
+    fmt.Printf("Contest %s\nTOTAL Issues %2d | PrizePool: %6d USDC | Total Shares: %6.3f\n",repoName, len(contest.Issues), contest.PrizePool, contest.GetTotalShares())
     fmt.Println()
+    var sanityCheck float64
     for _, issue := range contest.Issues {
         shares := issue.GetShares()
         percentage := shares / totalShares 
         reward := percentage * float64(contest.PrizePool)
-        fmt.Printf("Issue:  %5d \t| Duplicates: %5d \t| %s\n",issue.Number,len(issue.Duplicates), issue.Title)
+        sanityCheck += reward * float64((len(issue.Duplicates)+1))
+        fmt.Printf("Issue:  %5d \t| Duplicates: %5d \t| %s -\t%s\n",issue.Number,len(issue.Duplicates), issue.Severity,issue.Title)
         fmt.Printf("Shares: %5.3f\t| Percentage: %5.2f%%\t| Payout per Watson: %9.3f USDC\n",shares, percentage*100,reward)
         fmt.Println()
         }
+    if(contest.PrizePool != uint32(sanityCheck)) {
+        log.Fatal("ATTENTION: Total Payouts do not match Prizepool!!")
+    }
 
 	},
 }
